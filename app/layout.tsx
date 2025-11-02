@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Flowgen",
+  title: "Task-Eraa",
   description: "Project management app",
 };
 

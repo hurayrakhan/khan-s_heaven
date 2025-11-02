@@ -7,6 +7,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
+import logo from "../../public/logo.png";
+import Image from "next/image";
 
 // NOTE: This file is a single-file starter layout for Task-Era.
 // It assumes you have a Next.js app with Tailwind CSS and shadcn/ui components wired up.
@@ -19,7 +21,10 @@ export default function TaskEraLayout() {
         {/* Sidebar */}
         <aside className="w-64 min-h-screen bg-[#1E3A34] text-white sticky top-0 hidden md:flex flex-col">
           <div className="p-6 flex items-center gap-3 border-b border-white/6">
-            <div className="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center font-semibold">TE</div>
+            {
+                logo ? <Image src={logo} alt="Task-Era Logo" className="w-10 h-10 rounded-full object-cover" /> :
+                <div className="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center font-semibold">TE</div>
+            }
             <div>
               <h1 className="text-lg font-semibold">Task-Era</h1>
               <p className="text-xs text-white/70">Project Management</p>

@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String       @id @default(cuid())
+  name          String?
+  email         String       @unique
+  password      String
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  teams         TeamMember[]
+
+  // 👇 Added back-relations
+  createdTeams  Team[] @relation("TeamAdmin")
+  assignedTasks Task[] @relation("TaskAssignee")
+}
+
+model Team {
+  id        String @id @default(cuid())
+  name      String
+  createdBy String
+
+  // 👇 Add a relation name to link both sides clearly
+  admin User @relation("TeamAdmin", fields: [createdBy], references: [id])
+
+  members   TeamMember[]
+  tasks     Task[]
+  createdAt DateTime     @default(now())
+}
+
+model TeamMember {
+  id     String @id @default(cuid())
+  userId String
+  teamId String
+  user   User   @relation(fields: [userId], references: [id])
+  team   Team   @relation(fields: [teamId], references: [id])
+}
+
+model Task {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  status      String  @default("todo")
+  teamId      String
+  assignedTo  String?
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  // 👇 Add relation name to match User model
+  assignee User? @relation("TaskAssignee", fields: [assignedTo], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
