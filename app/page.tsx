@@ -1,4 +1,4 @@
-import TaskEraLayout from "./component/TaskEraLayout";
+import TaskEraLayout from "../components/TaskEraLayout";
 
 export default function Home() {
   return (

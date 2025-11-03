@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast, ToastContainer } from "react-toastify";
@@ -28,7 +29,7 @@ export default function RegisterPage() {
         return;
       }
 
-      const res = await fetch("/api/auth/register", {
+      const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -62,15 +63,11 @@ export default function RegisterPage() {
   async function handleSocialSignIn(provider: string) {
     setLoading(true);
     try {
-      // Use redirect: false to handle errors client-side if needed
-      const res = await fetch(`/api/auth/${provider}`, {
-        method: "POST",
-      });
-      if (!res.ok) throw new Error("Authentication failed");
-      router.push("/dashboard");
+      await signIn(provider, { callbackUrl: "/dashboard" });
     } catch (error) {
       console.error(error);
       toast.error("Social sign-in failed");
+    } finally {
       setLoading(false);
     }
   }

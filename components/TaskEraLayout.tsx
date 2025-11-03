@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import logo from "../../public/logo.png";
+import logo from "../public/logo.png";
 import Image from "next/image";
 
 // NOTE: This file is a single-file starter layout for Task-Era.
