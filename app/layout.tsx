@@ -40,11 +40,7 @@ export const metadata: Metadata = {
     description: "Task-Era helps teams move work forward. Collaborate, manage projects, and reach new productivity peaks.",
     creator: "@TaskEra",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-  },
+  // viewport moved to the dedicated `viewport` export to satisfy Next.js generate-viewport
   robots: {
     index: true,
     follow: true,
@@ -56,6 +52,12 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

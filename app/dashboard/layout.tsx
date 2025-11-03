@@ -19,7 +19,7 @@ import {
   Settings as SettingsIcon,
   LogOut,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 export default function DashboardLayout({
@@ -30,26 +30,30 @@ export default function DashboardLayout({
   const { data: session } = useSession();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [teams, setTeams] = useState<Array<{ id: string; name: string }>>([]);
 
-  const navSections = [
-    {
-      title: null,
-      items: ["Dashboard", "Orders", "Tickets", "Clients"],
-    },
-    {
-      title: "Billing",
-      items: ["Invoices", "Subscriptions"],
-    },
-    {
-      title: "Setup",
-      items: ["Integrations", "Settings"],
-    },
-  ];
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      try {
+        const res = await fetch("/api/my/teams");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (mounted) setTeams(data.teams || []);
+      } catch {
+        // ignore
+      }
+    }
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 text-slate-900">
       <div className="flex">
-        {/* Sidebar (md+) */}
+        {/* Desktop sidebar (md+) */}
         <aside className="w-64 min-h-screen bg-[#1E3A34] text-white sticky top-0 hidden md:flex flex-col">
           <div className="p-6 flex items-center gap-3 border-b border-white/6">
             <Image src="/logo.png" alt="Task-Era Logo" width={36} height={36} className="w-10 h-10 rounded-full object-cover" />
@@ -60,24 +64,81 @@ export default function DashboardLayout({
           </div>
 
           <nav className="p-4 flex-1 space-y-1 overflow-y-auto">
-            {navSections.map((section, idx) => (
-              <div key={idx}>
-                {section.title && (
-                  <div className="mt-6 pt-4 border-t border-white/6 text-xs text-white/70">{section.title}</div>
-                )}
-                {section.items.map((label) => (
-                  <NavItem key={label} label={label} />
-                ))}
-              </div>
-            ))}
+            <div>
+              <div className="text-xs text-white/70 mb-2">Your teams</div>
+              {teams.length === 0 && (
+                <div className="text-sm text-white/60">No teams yet</div>
+              )}
+              {teams.map((t) => (
+                <Link key={t.id} href={`/dashboard/teams/${t.id}`} className="block mb-1">
+                  <NavItem label={t.name} active={pathname === `/dashboard/teams/${t.id}`} />
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-white/6 text-xs text-white/70">Explore</div>
+            <Link href="/dashboard">
+              <NavItem label="Overview" active={pathname === "/dashboard"} />
+            </Link>
+            <Link href="/dashboard/teams">
+              <NavItem label="Teams" active={pathname?.startsWith("/dashboard/teams") ?? false} />
+            </Link>
+            <Link href="/dashboard/tasks">
+              <NavItem label="My Tasks" active={pathname === "/dashboard/tasks"} />
+            </Link>
           </nav>
 
           <div className="p-4 border-t border-white/6">
-            <Button className="w-full" variant="secondary">
-              Create Team
-            </Button>
+            <Link href="/dashboard/teams/create" className="block">
+              <Button className="w-full" variant="secondary">
+                Create Team
+              </Button>
+            </Link>
           </div>
         </aside>
+
+        {/* Mobile sidebar (slide-over) */}
+        <div
+          className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#1E3A34] text-white transform transition-transform duration-200 ease-in-out md:hidden ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <div className="p-6 flex items-center gap-3 border-b border-white/6">
+            <Image src="/logo.png" alt="Task-Era Logo" width={36} height={36} className="w-10 h-10 rounded-full object-cover" />
+            <div>
+              <h1 className="text-lg font-semibold">Task-Era</h1>
+            </div>
+            <div className="ml-auto">
+              <Button variant="ghost" onClick={() => setIsSidebarOpen(false)}>Close</Button>
+            </div>
+          </div>
+          <nav className="p-4 flex-1 space-y-1 overflow-y-auto">
+            <div className="text-xs text-white/70 mb-2">Your teams</div>
+            {teams.map((t) => (
+              <Link key={t.id} href={`/dashboard/teams/${t.id}`} className="block mb-1" onClick={() => setIsSidebarOpen(false)}>
+                <NavItem label={t.name} active={pathname === `/dashboard/teams/${t.id}`} />
+              </Link>
+            ))}
+
+            <div className="mt-6 pt-4 border-t border-white/6 text-xs text-white/70">Explore</div>
+            <Link href="/dashboard" onClick={() => setIsSidebarOpen(false)}>
+              <NavItem label="Overview" active={pathname === "/dashboard"} />
+            </Link>
+            <Link href="/dashboard/teams" onClick={() => setIsSidebarOpen(false)}>
+              <NavItem label="Teams" active={pathname?.startsWith("/dashboard/teams") ?? false} />
+            </Link>
+            <Link href="/dashboard/tasks" onClick={() => setIsSidebarOpen(false)}>
+              <NavItem label="My Tasks" active={pathname === "/dashboard/tasks"} />
+            </Link>
+          </nav>
+          <div className="p-4 border-t border-white/6">
+            <Link href="/dashboard/teams/create" onClick={() => setIsSidebarOpen(false)}>
+              <Button className="w-full" variant="secondary">
+                Create Team
+              </Button>
+            </Link>
+          </div>
+        </div>
 
         {/* Main area */}
         <div className="flex-1">
@@ -170,9 +231,15 @@ export default function DashboardLayout({
 }
 
 /* Small helper components reused from TaskEraLayout */
-function NavItem({ label }: { label: string }) {
+function NavItem({ label, active }: { label: string; active?: boolean }) {
   return (
-    <div className="rounded-md px-3 py-2 hover:bg-white/6 cursor-pointer flex items-center gap-3">
+    <div
+      role="link"
+      aria-current={active ? "page" : undefined}
+      className={`${
+        active ? "bg-[#2A4E47] text-white" : "text-white/90 hover:bg-white/6"
+      } rounded-md px-3 py-2 cursor-pointer flex items-center gap-3`}
+    >
       <div className="w-8 h-8 bg-white/6 rounded flex items-center justify-center text-sm">{label[0]}</div>
       <span className="text-sm">{label}</span>
     </div>
