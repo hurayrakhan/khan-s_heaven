@@ -14,14 +14,13 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  CalendarDays,
-  Users,
-  Settings,
-  LogOut,
   Menu,
+  Bell,
+  Settings as SettingsIcon,
+  LogOut,
 } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function DashboardLayout({
   children,
@@ -32,111 +31,86 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const navigation = [
+  const navSections = [
     {
-      name: "Dashboard",
-      href: "/dashboard",
-      icon: LayoutDashboard,
-      current: pathname === "/dashboard",
+      title: null,
+      items: ["Dashboard", "Orders", "Tickets", "Clients"],
     },
     {
-      name: "Tasks",
-      href: "/dashboard/tasks",
-      icon: CalendarDays,
-      current: pathname === "/dashboard/tasks",
+      title: "Billing",
+      items: ["Invoices", "Subscriptions"],
     },
     {
-      name: "Team",
-      href: "/dashboard/team",
-      icon: Users,
-      current: pathname === "/dashboard/team",
-    },
-    {
-      name: "Settings",
-      href: "/dashboard/settings",
-      icon: Settings,
-      current: pathname === "/dashboard/settings",
+      title: "Setup",
+      items: ["Integrations", "Settings"],
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#1E3A34] transform transition-transform duration-200 ease-in-out ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0`}
-      >
-        <div className="flex h-16 items-center justify-between px-4">
-          <Link href="/dashboard" className="text-white font-bold text-xl">
-            Task-Era
-          </Link>
-        </div>
-        <nav className="mt-5 px-2 space-y-1">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`${
-                item.current
-                  ? "bg-[#2A4E47] text-white"
-                  : "text-gray-300 hover:bg-[#2A4E47] hover:text-white"
-              } group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
-            >
-              <item.icon
-                className={`${
-                  item.current ? "text-white" : "text-gray-400 group-hover:text-white"
-                } mr-3 shrink-0 h-6 w-6`}
-                aria-hidden="true"
-              />
-              {item.name}
-            </Link>
-          ))}
-        </nav>
-      </div>
+    <div className="min-h-screen bg-gray-50 text-slate-900">
+      <div className="flex">
+        {/* Sidebar (md+) */}
+        <aside className="w-64 min-h-screen bg-[#1E3A34] text-white sticky top-0 hidden md:flex flex-col">
+          <div className="p-6 flex items-center gap-3 border-b border-white/6">
+            <Image src="/logo.png" alt="Task-Era Logo" width={36} height={36} className="w-10 h-10 rounded-full object-cover" />
+            <div>
+              <h1 className="text-lg font-semibold">Task-Era</h1>
+              <p className="text-xs text-white/70">Project Management</p>
+            </div>
+          </div>
 
-      {/* Main content */}
-      <div
-        className={`lg:pl-64 flex flex-col transition-padding duration-200 ${
-          isSidebarOpen ? "pl-64" : "pl-0"
-        }`}
-      >
-        {/* Navbar */}
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-          <Button
-            variant="ghost"
-            className="-m-2.5 p-2.5 lg:hidden"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          >
-            <span className="sr-only">Open sidebar</span>
-            <Menu className="h-6 w-6" aria-hidden="true" />
-          </Button>
+          <nav className="p-4 flex-1 space-y-1 overflow-y-auto">
+            {navSections.map((section, idx) => (
+              <div key={idx}>
+                {section.title && (
+                  <div className="mt-6 pt-4 border-t border-white/6 text-xs text-white/70">{section.title}</div>
+                )}
+                {section.items.map((label) => (
+                  <NavItem key={label} label={label} />
+                ))}
+              </div>
+            ))}
+          </nav>
 
-          {/* Separator */}
-          <div className="h-6 w-px bg-gray-200 lg:hidden" aria-hidden="true" />
+          <div className="p-4 border-t border-white/6">
+            <Button className="w-full" variant="secondary">
+              Create Team
+            </Button>
+          </div>
+        </aside>
 
-          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6 justify-end">
-            <div className="flex items-center gap-x-4 lg:gap-x-6">
+        {/* Main area */}
+        <div className="flex-1">
+          {/* Topbar */}
+          <header className="flex items-center justify-between gap-4 bg-white px-4 py-3 border-b">
+            <div className="flex items-center gap-3">
+              <button className="md:hidden p-2 rounded-md bg-white/50" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                <Menu className="w-5 h-5 text-slate-700" />
+              </button>
+
+              <div className="relative">
+                <input
+                  placeholder="Search..."
+                  className="w-[560px] max-w-xs md:max-w-md lg:max-w-xl bg-slate-50 border rounded-md py-2 pl-10 pr-4 text-sm placeholder:text-slate-400"
+                />
+                <svg className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <Bell className="w-5 h-5 text-slate-600" />
+              <SettingsIcon className="w-5 h-5 text-slate-600" />
+
               {/* Profile dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative flex items-center gap-2 rounded-full bg-white p-0 text-sm focus:outline-none"
-                  >
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage
-                        src={session?.user?.image || ""}
-                        alt={session?.user?.name || ""}
-                      />
-                      <AvatarFallback>
-                        {session?.user?.name?.[0]?.toUpperCase() || "U"}
-                      </AvatarFallback>
+                  <Button variant="ghost" className="relative flex items-center gap-2 rounded-full bg-white p-0 text-sm focus:outline-none">
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || ""} />
+                      <AvatarFallback>{session?.user?.name?.[0]?.toUpperCase() || "U"}</AvatarFallback>
                     </Avatar>
                     <span className="hidden lg:flex lg:items-center">
-                      <span className="text-sm font-semibold leading-6 text-gray-900">
-                        {session?.user?.name}
-                      </span>
+                      <span className="text-sm font-semibold leading-6 text-gray-900">{session?.user?.name}</span>
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -150,26 +124,81 @@ export default function DashboardLayout({
                     <Link href="/dashboard/settings">Settings</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-red-600 cursor-pointer"
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                  >
+                  <DropdownMenuItem className="text-red-600 cursor-pointer" onClick={() => signOut({ callbackUrl: "/" })}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-          </div>
-        </div>
+          </header>
 
-        {/* Content area */}
-        <main className="flex-1">
-          <div className="py-6">
-            <div className="mx-auto px-4 sm:px-6 lg:px-8">{children}</div>
-          </div>
-        </main>
+          {/* Content layout */}
+          <main className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">{children}</div>
+
+            <aside className="space-y-4">
+              <div className="bg-white p-4 rounded-md shadow-sm">
+                <h3 className="text-sm font-medium">Note</h3>
+                <textarea className="w-full mt-2 p-2 rounded border text-sm h-24 resize-none" placeholder="Add note for your team..."></textarea>
+              </div>
+
+              <div className="bg-white p-4 rounded-md shadow-sm">
+                <h4 className="text-sm font-semibold">Details</h4>
+                <div className="mt-3 text-sm text-slate-600 space-y-2">
+                  <Row label="Service" value="Starter Plan" />
+                  <Row label="Client" value="Globex Industries" />
+                  <Row label="Status" value={<StatusBadge label="Pending" variant="orange" />} />
+                  <Row label="Assign To" value={<AssigneeList />} />
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-md shadow-sm">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium">Invoice</h4>
+                  <span className="text-sm text-green-600 font-semibold">Paid</span>
+                </div>
+                <div className="mt-3 text-sm text-slate-600">Amount</div>
+                <div className="text-lg font-bold">$500.00</div>
+              </div>
+            </aside>
+          </main>
+        </div>
       </div>
+    </div>
+  );
+}
+
+/* Small helper components reused from TaskEraLayout */
+function NavItem({ label }: { label: string }) {
+  return (
+    <div className="rounded-md px-3 py-2 hover:bg-white/6 cursor-pointer flex items-center gap-3">
+      <div className="w-8 h-8 bg-white/6 rounded flex items-center justify-center text-sm">{label[0]}</div>
+      <span className="text-sm">{label}</span>
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-start justify-between">
+      <div className="text-sm text-slate-500">{label}</div>
+      <div className="text-sm">{value}</div>
+    </div>
+  );
+}
+
+function StatusBadge({ label, variant = "green" }: { label: string; variant?: "green" | "orange" | "red" }) {
+  const base = "inline-block px-2 py-1 text-xs font-semibold rounded";
+  const cls = variant === "green" ? "bg-green-100 text-green-800" : variant === "orange" ? "bg-orange-100 text-orange-800" : "bg-red-100 text-red-800";
+  return <span className={`${base} ${cls}`}>{label}</span>;
+}
+
+function AssigneeList() {
+  return (
+    <div className="flex items-center gap-2">
+      <div className="text-xs px-2 py-1 rounded bg-slate-100">Jane Cooper</div>
+      <div className="text-xs px-2 py-1 rounded bg-slate-100">Lipton Das</div>
     </div>
   );
 }
