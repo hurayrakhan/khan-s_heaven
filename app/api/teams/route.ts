@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
@@ -21,11 +22,12 @@ export async function POST(req: Request, context: any) {
     // find user
     const user = await prisma.user.findUnique({ where: { email: session.user.email } });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+    
 
     // create team
     const team = await prisma.team.create({
       data: {
-        name,
+        name: name.trim(),
         createdBy: user.id,
       },
     });

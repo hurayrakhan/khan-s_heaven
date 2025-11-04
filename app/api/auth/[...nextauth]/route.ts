@@ -23,11 +23,18 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user) throw new Error("User not found");
+        if (user.deletedAt) throw new Error("Account has been deactivated");
 
         const isValid = await bcrypt.compare(credentials.password, user.password);
         if (!isValid) throw new Error("Invalid credentials");
 
-        return { id: user.id, name: user.name, email: user.email };
+        return { 
+          id: user.id, 
+          name: user.name, 
+          email: user.email,
+          role: user.role,
+          image: user.image
+        };
       },
     }),
   ],

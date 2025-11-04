@@ -86,6 +86,21 @@ export default function DashboardLayout({
             <Link href="/dashboard/tasks">
               <NavItem label="My Tasks" active={pathname === "/dashboard/tasks"} />
             </Link>
+
+            {session?.user?.role === 'ADMIN' && (
+              <>
+                <div className="mt-6 pt-4 border-t border-white/6 text-xs text-white/70">Admin</div>
+                <Link href="/dashboard/admin">
+                  <NavItem label="Users" active={pathname === "/dashboard/admin"} />
+                </Link>
+                <Link href="/dashboard/admin/teams">
+                  <NavItem label="Teams" active={pathname === "/dashboard/admin/teams"} />
+                </Link>
+                <Link href="/dashboard/admin/logs">
+                  <NavItem label="Activity Logs" active={pathname === "/dashboard/admin/logs"} />
+                </Link>
+              </>
+            )}
           </nav>
 
           <div className="p-4 border-t border-white/6">
@@ -130,6 +145,21 @@ export default function DashboardLayout({
             <Link href="/dashboard/tasks" onClick={() => setIsSidebarOpen(false)}>
               <NavItem label="My Tasks" active={pathname === "/dashboard/tasks"} />
             </Link>
+
+            {session?.user?.role === 'ADMIN' && (
+              <>
+                <div className="mt-6 pt-4 border-t border-white/6 text-xs text-white/70">Admin</div>
+                <Link href="/dashboard/admin" onClick={() => setIsSidebarOpen(false)}>
+                  <NavItem label="Users" active={pathname === "/dashboard/admin"} />
+                </Link>
+                <Link href="/dashboard/admin/teams" onClick={() => setIsSidebarOpen(false)}>
+                  <NavItem label="Teams" active={pathname === "/dashboard/admin/teams"} />
+                </Link>
+                <Link href="/dashboard/admin/logs" onClick={() => setIsSidebarOpen(false)}>
+                  <NavItem label="Activity Logs" active={pathname === "/dashboard/admin/logs"} />
+                </Link>
+              </>
+            )}
           </nav>
           <div className="p-4 border-t border-white/6">
             <Link href="/dashboard/teams/create" onClick={() => setIsSidebarOpen(false)}>

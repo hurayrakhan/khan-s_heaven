@@ -126,7 +126,7 @@ export default function HomePage() {
                         </Button>
                         <Button
                             variant="outline"
-                            className="w-full sm:w-auto px-8 py-3 text-base font-medium text-white border-white hover:bg-white/10"
+                            className="w-full sm:w-auto px-8 py-3 text-black font-medium border-white hover:bg-white/10 hover:text-white"
                             onClick={() => router.push("/login")}
                         >
                             Learn more
