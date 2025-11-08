@@ -38,14 +38,25 @@ export async function POST(req: Request, context: any) {
       if (!member) return NextResponse.json({ error: "Assignee not a team member" }, { status: 400 });
     }
 
+    // const task = await prisma.task.create({
+    //   data: {
+    //     title,
+    //     description,
+    //     teamId,
+    //     assignedTo: assigneeId,
+    //   },
+    // });
+
     const task = await prisma.task.create({
       data: {
         title,
         description,
-        teamId,
-        assignedTo: assigneeId,
+        team: { connect: { id: teamId } },
+        creator: { connect: { id: user.id } },
+        assignee: assignedTo ? { connect: { id: assignedTo } } : undefined,
       },
     });
+
 
     return NextResponse.json({ task });
   } catch (err) {

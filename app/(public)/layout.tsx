@@ -31,7 +31,7 @@ export default function PublicLayout({
               <Link href="/" className="flex items-center gap-2">
                 <Image
                   src="/logo.png"
-                  alt="Task-Era"
+                  alt="Task-Era logo"
                   width={36}
                   height={36}
                   className="rounded-full"

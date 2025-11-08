@@ -29,6 +29,7 @@ export async function POST(req: Request, context: any) {
       data: {
         name: name.trim(),
         createdBy: user.id,
+        managedBy: user.id,
       },
     });
 
@@ -37,6 +38,7 @@ export async function POST(req: Request, context: any) {
       data: {
         userId: user.id,
         teamId: team.id,
+        role: "ADMIN",
       },
     });
 
